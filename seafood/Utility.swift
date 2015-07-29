@@ -14,10 +14,11 @@ class Utility {
     static let port="3005"
     
     class func generateRequestObject( method: String,resource: String,postString : String?=nil ) -> NSMutableURLRequest{
-        let url = NSURL(string: "http://"+host+":"+port+resource)
+        let url = NSURL(string: "http://\(host):\(port)\(resource)")
         let request = NSMutableURLRequest(URL: url!)
         request.HTTPMethod=method
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue(NSUserDefaults.standardUserDefaults().stringForKey("token"), forHTTPHeaderField: "token")
         request.HTTPBody = postString?.dataUsingEncoding(NSUTF8StringEncoding)!
         
         return request

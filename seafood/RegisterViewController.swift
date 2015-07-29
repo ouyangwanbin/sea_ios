@@ -47,7 +47,7 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
                 self.emailValidateLabel.text="invalid email format"
                 return
             }
-            let request:NSMutableURLRequest = Utility.generateRequestObject("GET", resource: "/api/search-user/"+email)
+            let request:NSMutableURLRequest = Utility.generateRequestObject("GET", resource: "/api/search-user/\(email)")
             let task = NSURLSession.sharedSession().dataTaskWithRequest(request){
                 data, response, error in
                 if( error != nil ){
@@ -83,18 +83,17 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        let email = emailTextField.text
-        let password = passwordTextField.text
-        let confirmPassword = confirmPasswordTextField.text
-        if ( email.isEmpty || password.isEmpty || confirmPassword.isEmpty ){
-            btnRegister.enabled = false
-        }else{
-            btnRegister.enabled = true
-        }
-        return true
+
+    @IBAction func emailEditChange(sender: UITextField) {
+        self.checkTextField()
     }
     
+    @IBAction func passwordEditChange(sender: UITextField) {
+        self.checkTextField()
+    }
+    @IBAction func confirmPasswordEditChange(sender: UITextField) {
+        self.checkTextField()
+    }
     @IBAction func btnRegister(sender: UIButton) {
         
         let email = emailTextField.text
@@ -109,7 +108,7 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
         }
         //save register information
         //post http://www.go2fish.com/api/users
-        let post="email="+email+"&password="+password
+        let post="email=\(email)&password=\(password)"
         
         let request:NSMutableURLRequest = Utility.generateRequestObject("POST", resource: "/api/users", postString: post)
         
@@ -144,10 +143,7 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
                 }else{
 
                     NSOperationQueue.mainQueue().addOperationWithBlock {
-                        //store data
-                        NSUserDefaults.standardUserDefaults().setObject(email, forKey: "email")
-                        NSUserDefaults.standardUserDefaults().synchronize()
-                        self.showSuccessAlert()
+                        Utility.showMyAlert(self,userMessage:"Register Success")
                     }
                 }
                 
@@ -164,6 +160,7 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
         self.emailTextField.enabled = false
         self.passwordTextField.enabled = false
         self.confirmPasswordTextField.enabled = false
+        self.btnRegister.enabled = false
         self.activityIND.hidden = false
         self.activityIND.startAnimating()
     }
@@ -174,26 +171,20 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
         self.emailTextField.enabled = true
         self.passwordTextField.enabled = true
         self.confirmPasswordTextField.enabled = true
+        self.btnRegister.enabled = true
         self.activityIND.hidden = true
         self.activityIND.stopAnimating()
     }
     
-    func showSuccessAlert( ){
-        //Create the AlertController
-        let actionSheetController: UIAlertController = UIAlertController(title: nil, message: "Register Success", preferredStyle: .Alert)
-        
-        //Create and add the Cancel action
-        let cancelAction: UIAlertAction = UIAlertAction(title: "Cancel", style: .Cancel) { action -> Void in
-            //do nothing.
+    func checkTextField(){
+        let email = emailTextField.text
+        let password = passwordTextField.text
+        let confirmPassword = confirmPasswordTextField.text
+        if ( email.isEmpty || password.isEmpty || confirmPassword.isEmpty ){
+            btnRegister.enabled = false
+        }else{
+            btnRegister.enabled = true
         }
-        actionSheetController.addAction(cancelAction)
-        //Create and add confirm action
-        let confirmAction: UIAlertAction = UIAlertAction(title: "Confirm", style: .Default) { action -> Void in
-            //go to login view
-            self.dismissViewControllerAnimated(true, completion: nil)
-        }
-        actionSheetController.addAction(confirmAction)
-        //Present the AlertController
-        self.presentViewController(actionSheetController, animated: true, completion: nil)
+
     }
 }

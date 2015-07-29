@@ -16,6 +16,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        var rootViewController = self.window!.rootViewController
+        let navigationController = application.windows[0].rootViewController as! UINavigationController
+        let mainStoryboard:UIStoryboard = UIStoryboard( name: "Main", bundle: nil)
+        
+        //check is the user login
+        var email:String? = NSUserDefaults.standardUserDefaults().stringForKey("email")
+        // user is logged in
+        if( email != nil){
+            var mainController=mainStoryboard.instantiateViewControllerWithIdentifier("mainView") as! UITableViewController
+            navigationController.pushViewController(mainController, animated: false)
+        }
         return true
     }
 
